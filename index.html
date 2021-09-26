@@ -169,6 +169,7 @@ ul>li:not(:nth-child(1)):before {
               },
               'filter': ['==', '$type', 'Point'],
             });
+            /*
             map.on('click', 'csvData', function (e) {
               var coordinates = e.features[0].geometry.coordinates.slice();
               var description = '<h3>' + e.features[0].properties.title + '</h3><h4><b>' + 'Location: ' + '</b>' + e.features[0].properties.pref + e.features[0].properties.city + '</h4><h4><b>' + 'Tweet: ' + '</b><a href="' + e.features[0].properties.tweet + '">' + e.features[0].properties.tweet + '</a></h4><div class="portalPhoto"><img src="' + e.features[0].properties.image + '"></div>';
@@ -187,6 +188,7 @@ ul>li:not(:nth-child(1)):before {
             map.fitBounds(bbox, {
               padding: 50
             });
+            */
           });
         });
       };
