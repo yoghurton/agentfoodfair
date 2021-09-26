@@ -172,7 +172,7 @@ ul>li:not(:nth-child(1)):before {
 
             new mapboxgl.Popup()
                 .setLngLat(data.features[0].geometry.coordinates)
-                .setHTML('<h3>' + e.features[0].properties.title + '</h3><p>' + e.features[0].properties.dtweet + '</p>')
+                .setHTML('<h3>' + data.features[0].properties.title + '</h3><p>' + data.features[0].properties.tweet + '</p>')
                 .addTo(map);
 
           });
@@ -183,3 +183,189 @@ ul>li:not(:nth-child(1)):before {
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Showcase | Wayfarer</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://npmcdn.com/csv2geojson@latest/csv2geojson.js'></script>
+  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+  <script src="https://kit.fontawesome.com/5015486454.js" crossorigin="anonymous"></script>
+  <style>
+a {
+  text-decoration: none;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+ul {
+  padding-left: 0;
+  list-style: none;
+}
+ul, li {
+  font-size: 90%;
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+ul>li {
+  display: inline;
+}
+ul>li:not(:nth-child(1)):before {
+  content: ' | ';
+  color: #666;
+}
+.category {
+  padding: 2px;
+}
+.category:empty {
+  padding: 0;
+}
+.mapboxgl-container {
+  cursor: pointer;
+}
+.mapboxgl-popup {
+  padding-bottom: 0;
+}
+.mapboxgl-popup-anchor-top>.mapboxgl-popup-content {
+  margin-top: 3px;
+}
+.mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
+  border-bottom-color: rgb(61, 59, 59);
+}
+.mapboxgl-popup-close-button {
+  display: none;
+}
+.mapboxgl-popup-content div.portalPhoto {
+  width: 100%;
+  text-align: center;
+}
+.mapboxgl-popup-content h3 {
+  font-weight: 700;
+  display: block;
+  margin: 0;
+  margin-top: -5px;
+  padding: 5px 10px;
+  text-align: center;
+  color: #fff;
+  background: rgb(61, 59, 59);
+}
+.mapboxgl-popup-content h4 {
+  font-weight: 400;
+  line-height: 1.8;
+  display: block;
+  margin: 0;
+  padding: 0 5px;
+}
+.mapboxgl-popup-content {
+  font: 400 11px/16px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  width: 225px;
+  padding: 0;
+}
+.mapboxgl-popup-content-wrapper {
+  padding: 1%;
+}
+.portalPhoto img {
+  width: 215px;
+  height: 215px;
+  margin-top: 10px;
+  object-fit: cover;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+#menu {
+  font-family: 'Open Sans', sans-serif;
+  position: absolute;
+  padding: 5px;
+  background: rgba(191, 191, 191, .6);
+}
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+  <div id="menu">
+    <ul>
+      <li type="disc"><a href="https://docs.google.com/spreadsheets/d/1ry2hwuzi-SArBQhrsDAP9LTJHBbi3hAyWGo9a4JBxfI/edit?usp=sharing"><i class="fas fa-table"></i> データ(スプレッドシート)</a></li>
+      <li type="disc"><a href="https://forms.gle/JbQJandHtdTSoeLp8"><i class="fas fa-file-upload"></i> データ登録フォーム</a></li>
+    </ul>
+  </div>
+  <script>
+    var transformRequest = (url, resourceType) => {
+      var isMapboxRequest = url.slice(8, 22) === "api.mapbox.com" || url.slice(10, 26) === "tiles.mapbox.com";
+      return {
+        url: isMapboxRequest ? url.replace("?", "?pluginName=sheetMapper&") : url
+      };
+    };
+    mapboxgl.accessToken = 'pk.eyJ1IjoieW9naHVydG9uIiwiYSI6ImNrMWMzaTRodTAwMXkzbG5wdXJvMXFuYXoifQ.7TYzn64qL5_Kktp--kX6Dw';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/yoghurton/cksn875dm2ivp17poo64eew9m',
+      center: [140.084556, 36.104611],
+      zoom: 4.5,
+      transformRequest: transformRequest
+    });
+    $(document).ready(function () {
+      $.ajax({
+        type: "GET",
+        url: 'https://docs.google.com/spreadsheets/d/10D5fdxLMQCKvzW6FEHTa8jJggvFKbZtnaMbIJQy-L4Y/gviz/tq?tqx=out:csv&sheet=map',
+        dataType: "text",
+        success: function (csvData) {
+          makeGeoJSON(csvData);
+        }
+      });
+
+      function makeGeoJSON(csvData) {
+        csv2geojson.csv2geojson(csvData, {
+          latfield: 'lat',
+          lonfield: 'lng',
+          delimiter: ','
+        }, function (err, data) {
+          map.on('load', function () {
+            map.addLayer({
+              'id': 'csvData',
+              'type': 'circle',
+              'source': {
+                'type': 'geojson',
+                'data': data
+              },
+              'paint': {
+                'circle-radius': 3.5,
+                'circle-color': '#ff0099',
+                'circle-stroke-width': 1.0,
+                'circle-stroke-color': '#222222'
+              },
+              'filter': ['==', '$type', 'Point'],
+            });
+
+            new mapboxgl.Popup()
+                .setLngLat(data.features[0].geometry.coordinates)
+                .setHTML('<h3>' + data.features[0].properties.title + '</h3><p>' + data.features[0].properties.tweet + '</p>')
+                .addTo(map);
+
+          });
+        });
+
+      };
+    });
+  </script>
+</body>
+</html>
+s
