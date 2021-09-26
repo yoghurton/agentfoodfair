@@ -169,18 +169,26 @@ ul>li:not(:nth-child(1)):before {
               },
               'filter': ['==', '$type', 'Point'],
             });
+            addMarkers();
+
           });
-
-            new mapboxgl.Popup()
-                .setLngLat(data.features[0].geometry.coordinates)
-                .setHTML('<h3>' + data.features[0].properties.title + '</h3><p>' + data.features[0].properties.tweet + '</p>')
-                .addTo(map);
-
-
         });
 
       };
     });
+
+    function addMarkers() {
+      data.features.forEach(function(marker) {
+        var el = document.createElement('div');
+        el.id = "marker-" + marker.properties.name;
+        el.className = 'cpl-map-marker';
+        new mapboxgl.Popup()
+                .setLngLat(marker.geometry.coordinates)
+                .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.tweet + '</p>')
+                .addTo(map);
+      });
+    }
+
   </script>
 </body>
 </html>
