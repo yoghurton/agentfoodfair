@@ -170,10 +170,14 @@ ul>li:not(:nth-child(1)):before {
               'filter': ['==', '$type', 'Point'],
             });
 
-            console.log(data);
+            new mapboxgl.Popup()
+                .setLngLat(data.features[0].geometry.coordinates)
+                .setHTML('<h3>' + e.features[0].properties.title + '</h3><p>' + e.features[0].properties.dtweet + '</p>')
+                .addTo(map);
 
           });
         });
+
       };
     });
   </script>
