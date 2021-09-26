@@ -171,8 +171,6 @@ ul>li:not(:nth-child(1)):before {
             });
             //addMarkers();
 
-          });
-
 data.features.forEach(function(marker) {
   var el = document.createElement('div');
   el.className = 'marker';
@@ -182,6 +180,10 @@ data.features.forEach(function(marker) {
     .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.tweet + '</p>'))
     .addTo(map);
 });
+
+
+          });
+
 
         });
 
